@@ -1,11 +1,11 @@
 # zenn-rust-bluesky-bot
 
-[Zenn の Rust トピック](https://zenn.dev/topics/rust) の新着記事を BlueSky に自動投稿するBotです。
+[Zenn の Rust トピック](https://zenn.dev/topics/rust) の新着記事を Bluesky に自動投稿するBotです。
 GitHub Actions で1時間ごとに実行されます。
 
 ## セットアップ
 
-### 1. BlueSky アプリパスワードを取得
+### 1. Bluesky アプリパスワードを取得
 
 [bsky.app](https://bsky.app) にログインし、
 **Settings > Privacy and Security > App Passwords** でアプリパスワードを生成します。
@@ -38,5 +38,5 @@ uv run bot.py
 
 1. `https://zenn.dev/topics/rust/feed` から RSS を取得
 2. `data/posted_ids.json` と照合して未投稿の記事を抽出
-3. BlueSky に投稿（URLはクリッカブルリンク付き）
+3. Bluesky に投稿（URLはクリッカブルリンク付き）
 4. `data/posted_ids.json` を更新してリポジトリにコミット
