@@ -1,3 +1,24 @@
 {
-  "posted_ids": []
+  "posted_ids": [
+    "https://zenn.dev/adachic/articles/30718020c47777",
+    "https://zenn.dev/amanita/articles/57371b532ee5c6",
+    "https://zenn.dev/crebo_tech/articles/001-rust-js-toolchain",
+    "https://zenn.dev/fjktkm/articles/2a29874805d0b8",
+    "https://zenn.dev/hideyuki_hori/articles/c794dcb1a0207e",
+    "https://zenn.dev/hiro_tech415/articles/9c8b10bb0e71ec",
+    "https://zenn.dev/lambdalisue/articles/introduce-arto-markdown-reader",
+    "https://zenn.dev/mitzh/articles/911642761bf792",
+    "https://zenn.dev/musoukun/articles/d8c79a6b44d12c",
+    "https://zenn.dev/musoukun/articles/e4673a57bb02f5",
+    "https://zenn.dev/nabekou29/articles/trev-terminal-tree-file-viewer",
+    "https://zenn.dev/nazuna315/articles/helsinki-cli",
+    "https://zenn.dev/northward/articles/rust-feeling-of-ownership",
+    "https://zenn.dev/pino0701/articles/scrap_paper_editor",
+    "https://zenn.dev/taktiks2/articles/just-task-runner",
+    "https://zenn.dev/ueda_keisuke/articles/2cf3524303d4da",
+    "https://zenn.dev/yottayoshida/articles/ai-agent-guardrail-bypass-jozu-omamori",
+    "https://zenn.dev/yottayoshida/articles/omamori-ai-cli-safety-guard",
+    "https://zenn.dev/yukimemi/articles/2026-03-20-shun",
+    "https://zenn.dev/zenchaine/articles/vite-plus-void-nextjs-impact"
+  ]
 }
