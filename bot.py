@@ -4,7 +4,9 @@ import time
 from pathlib import Path
 
 import feedparser
-from atproto import Client
+import httpx
+from atproto import Client, models
+from bs4 import BeautifulSoup
 
 RSS_URL = "https://zenn.dev/topics/rust/feed"
 STATE_FILE = Path("data/posted_ids.json")
@@ -33,51 +35,78 @@ def fetch_new_entries(posted_ids: set[str]) -> list[dict]:
     return new_entries
 
 
-def build_post_text(title: str, url: str) -> str:
-    text = f"{title}\n{url}"
-    # 300グラフィムを超えないようにタイトルを切り詰める
-    graphemes = list(text)
+def build_post_text(title: str) -> str:
+    # サムネイル付きリンクカードを使う場合、本文はタイトルのみ（URLは埋め込みに含まれる）
+    graphemes = list(title)
     if len(graphemes) > BLUESKY_MAX_GRAPHEMES:
-        max_title_len = BLUESKY_MAX_GRAPHEMES - len(url) - 4  # "\n..." の分
-        title = title[:max_title_len] + "..."
-        text = f"{title}\n{url}"
-    return text
+        title = title[: BLUESKY_MAX_GRAPHEMES - 3] + "..."
+    return title
 
 
-def build_facets(text: str, url: str) -> list:
-    text_bytes = text.encode("utf-8")
-    url_bytes = url.encode("utf-8")
-    byte_start = text_bytes.find(url_bytes)
-    if byte_start == -1:
-        return []
-    byte_end = byte_start + len(url_bytes)
-    return [
-        {
-            "$type": "app.bsky.richtext.facet",
-            "index": {
-                "$type": "app.bsky.richtext.facet#byteSlice",
-                "byteStart": byte_start,
-                "byteEnd": byte_end,
-            },
-            "features": [
-                {
-                    "$type": "app.bsky.richtext.facet#link",
-                    "uri": url,
-                }
-            ],
-        }
-    ]
+def fetch_ogp(url: str) -> dict:
+    """記事URLからOGPメタデータを取得する。失敗した場合は空dictを返す。"""
+    try:
+        resp = httpx.get(url, timeout=10, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+    except Exception as e:
+        print(f"OGP fetch failed for {url}: {e}")
+        return {}
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    def og(prop: str) -> str:
+        tag = soup.find("meta", property=f"og:{prop}") or soup.find("meta", attrs={"name": f"og:{prop}"})
+        return tag["content"] if tag and tag.get("content") else ""
+
+    return {
+        "title": og("title") or soup.title.string if soup.title else "",
+        "description": og("description"),
+        "image_url": og("image"),
+    }
+
+
+def upload_image(client: Client, image_url: str):
+    """OG画像をダウンロードしてBlueSkyにアップロードする。失敗した場合はNoneを返す。"""
+    if not image_url:
+        return None
+    try:
+        resp = httpx.get(image_url, timeout=10, follow_redirects=True)
+        resp.raise_for_status()
+        content_type = resp.headers.get("content-type", "image/jpeg").split(";")[0]
+        blob = client.upload_blob(resp.content)
+        return blob.blob
+    except Exception as e:
+        print(f"Image upload failed: {e}")
+        return None
+
+
+def build_embed(client: Client, url: str) -> models.AppBskyEmbedExternal.Main | None:
+    """リンクカード用のembedを構築する。OGP取得に失敗した場合はNoneを返す。"""
+    ogp = fetch_ogp(url)
+    if not ogp:
+        return None
+
+    thumb = upload_image(client, ogp.get("image_url", ""))
+
+    return models.AppBskyEmbedExternal.Main(
+        external=models.AppBskyEmbedExternal.External(
+            uri=url,
+            title=ogp.get("title", ""),
+            description=ogp.get("description", ""),
+            thumb=thumb,
+        )
+    )
 
 
 def post_to_bluesky(client: Client, entry: dict) -> None:
     title = entry.get("title", "(no title)")
     url = entry.get("link", "")
-    text = build_post_text(title, url)
-    facets = build_facets(text, url)
+    text = build_post_text(title)
+    embed = build_embed(client, url)
 
     client.send_post(
         text=text,
-        facets=facets if facets else None,
+        embed=embed,
         langs=["ja"],
     )
     print(f"Posted: {title}")
@@ -100,8 +129,8 @@ def main() -> None:
         for entry in new_entries:
             title = entry.get("title", "(no title)")
             url = entry.get("link", "")
-            text = build_post_text(title, url)
-            print(f"\n{text}\n{'-' * 40}")
+            text = build_post_text(title)
+            print(f"\n{text}\n{url}\n{'-' * 40}")
         return
 
     identifier = os.environ["BLUESKY_IDENTIFIER"]
