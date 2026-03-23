@@ -99,16 +99,37 @@ def build_embed(client: Client, url: str) -> models.AppBskyEmbedExternal.Main | 
     )
 
 
+def build_facets(text: str) -> list:
+    """テキスト内の #zenn をハッシュタグfacetとして返す。"""
+    facets = []
+    text_bytes = text.encode("utf-8")
+    tag_bytes = b"#zenn"
+    idx = text_bytes.find(tag_bytes)
+    if idx != -1:
+        facets.append(
+            models.AppBskyRichtextFacet.Main(
+                features=[models.AppBskyRichtextFacet.Tag(tag="zenn")],
+                index=models.AppBskyRichtextFacet.ByteSlice(
+                    byte_start=idx,
+                    byte_end=idx + len(tag_bytes),
+                ),
+            )
+        )
+    return facets
+
+
 def post_to_bluesky(client: Client, entry: dict) -> None:
     title = entry.get("title", "(no title)")
     author = entry.get("author", "")
     url = entry.get("link", "")
     text = build_post_text(title, author)
     embed = build_embed(client, url)
+    facets = build_facets(text)
 
     client.send_post(
         text=text,
         embed=embed,
+        facets=facets,
         langs=["ja"],
     )
     print(f"Posted: {title}")
@@ -133,7 +154,17 @@ def main() -> None:
             author = entry.get("author", "")
             url = entry.get("link", "")
             text = build_post_text(title, author)
-            print(f"\n{text}\n{url}\n{'-' * 40}")
+            facets = build_facets(text)
+            print(f"\n{text}\n{url}")
+            if facets:
+                for f in facets:
+                    tag = f.features[0].tag
+                    start = f.index.byte_start
+                    end = f.index.byte_end
+                    print(f"  facet: #{tag} (bytes {start}-{end})")
+            else:
+                print("  facet: なし（ハッシュタグが検出されませんでした）")
+            print("-" * 40)
         return
 
     identifier = os.environ["BLUESKY_IDENTIFIER"]
