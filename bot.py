@@ -35,12 +35,13 @@ def fetch_new_entries(posted_ids: set[str]) -> list[dict]:
     return new_entries
 
 
-def build_post_text(title: str) -> str:
-    # サムネイル付きリンクカードを使う場合、本文はタイトルのみ（URLは埋め込みに含まれる）
+def build_post_text(title: str, author: str) -> str:
+    suffix = f" | {author} #zenn"
+    max_title_graphemes = BLUESKY_MAX_GRAPHEMES - len(list(suffix))
     graphemes = list(title)
-    if len(graphemes) > BLUESKY_MAX_GRAPHEMES:
-        title = title[: BLUESKY_MAX_GRAPHEMES - 3] + "..."
-    return title
+    if len(graphemes) > max_title_graphemes:
+        title = title[:max_title_graphemes - 3] + "..."
+    return title + suffix
 
 
 def fetch_ogp(url: str) -> dict:
@@ -100,8 +101,9 @@ def build_embed(client: Client, url: str) -> models.AppBskyEmbedExternal.Main | 
 
 def post_to_bluesky(client: Client, entry: dict) -> None:
     title = entry.get("title", "(no title)")
+    author = entry.get("author", "")
     url = entry.get("link", "")
-    text = build_post_text(title)
+    text = build_post_text(title, author)
     embed = build_embed(client, url)
 
     client.send_post(
@@ -128,8 +130,9 @@ def main() -> None:
         print("\n--- DRY RUN: 以下の内容が投稿されます ---")
         for entry in new_entries:
             title = entry.get("title", "(no title)")
+            author = entry.get("author", "")
             url = entry.get("link", "")
-            text = build_post_text(title)
+            text = build_post_text(title, author)
             print(f"\n{text}\n{url}\n{'-' * 40}")
         return
 
