@@ -2,7 +2,7 @@ name: Zenn Rust RSS Bot
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 毎時0分
+    - cron: '47 * * * *'  # 毎時47分(0分だと混雑するので、あえてキリが悪い時間に変更している)
   workflow_dispatch:       # 手動実行も可能
 
 jobs:
