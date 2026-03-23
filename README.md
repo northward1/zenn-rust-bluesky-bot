@@ -16,7 +16,7 @@ GitHub Actions で1時間ごとに実行されます。
 
 | Secret 名 | 値 |
 |---|---|
-| `BLUESKY_IDENTIFIER` | BlueSky ハンドル（例: `yourname.bsky.social`） |
+| `BLUESKY_IDENTIFIER` | Bluesky ハンドル（例: `yourname.bsky.social`） |
 | `BLUESKY_APP_PASSWORD` | 手順1で生成したアプリパスワード |
 
 ### 3. GitHub Actions を有効化
