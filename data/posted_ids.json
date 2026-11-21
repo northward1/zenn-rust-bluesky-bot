@@ -1,5 +1,6 @@
 {
   "posted_ids": [
+    "https://zenn.dev/00_4/articles/rust-clap-file-input",
     "https://zenn.dev/00_4/articles/slint-rust-getting-started",
     "https://zenn.dev/00_4/articles/sqlx-rust-dynamic-query",
     "https://zenn.dev/0h_n0/articles/48d89cb18bf0e1",
@@ -740,6 +741,7 @@
     "https://zenn.dev/nogu3/articles/mando-stateless-switch",
     "https://zenn.dev/nogu3/articles/mat-case-happy-eyeballs",
     "https://zenn.dev/nogu3/articles/mat-ipk-hot-reload",
+    "https://zenn.dev/nogu3/articles/mat-native-controller",
     "https://zenn.dev/nogu3/articles/smart-home-house-rust-cli",
     "https://zenn.dev/nogu_d626/articles/d61a08a5db7d22",
     "https://zenn.dev/nojima/articles/338d153cb5dd35",
@@ -786,6 +788,7 @@
     "https://zenn.dev/okani/articles/d33d6fde806ea5",
     "https://zenn.dev/okani/articles/d5813f11c265c6",
     "https://zenn.dev/okani/articles/f0afc252ec5796",
+    "https://zenn.dev/okinawasoftware/articles/0a4ab02db10871",
     "https://zenn.dev/okssusucha/articles/20260701-openai-codex-sqlite-trace-log-ssd-wear",
     "https://zenn.dev/okssusucha/articles/20260715-agents-want-to-compile",
     "https://zenn.dev/okssusucha/articles/20260720-grok-build-open-source",
